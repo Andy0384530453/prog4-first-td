@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -51,6 +52,10 @@ public class Book {
 
     @Column(name = "current_stock")
     private Integer currentStock;
+
+    @ManyToOne
+    @JoinColumn(name = "id_category", nullable = false)
+    private Category category;
 
     @ManyToMany
     @JoinTable(
