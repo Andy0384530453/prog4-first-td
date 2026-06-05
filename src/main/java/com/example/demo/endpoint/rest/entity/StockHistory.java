@@ -1,0 +1,46 @@
+package com.example.demo.endpoint.rest.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "stock_history")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class StockHistory {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id_stock_history", updatable = false, nullable = false)
+    private UUID id;
+
+    @ManyToOne
+    @JoinColumn(name = "id_book", nullable = false)
+    private Book book;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "movement_type", nullable = false)
+    private MovementType movementType;
+
+    @Column(name = "movement_date", nullable = false)
+    private LocalDateTime movementDate;
+
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
+}
