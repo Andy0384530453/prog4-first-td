@@ -39,7 +39,7 @@ public class Book {
     private String title;
 
     @Column(name = "genre")
-    private String genre;
+    private GenreEnum genre;
 
     @Column(name = "publication_date")
     private LocalDate publicationDate;
