@@ -11,23 +11,25 @@ import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "category")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Category {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id_category", updatable = false, nullable = false)
-    private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(name = "id_category", updatable = false, nullable = false)
+  private UUID id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "category_name", nullable = false, unique = true)
-    private CategoryEnum categoryEnum;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "category_name", nullable = false, unique = true)
+  private CategoryEnum categoryEnum;
 }

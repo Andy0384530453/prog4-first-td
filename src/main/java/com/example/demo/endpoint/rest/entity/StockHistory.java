@@ -14,33 +14,42 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "stock_history")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class StockHistory {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id_stock_history", updatable = false, nullable = false)
-    private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(name = "id_stock_history", updatable = false, nullable = false)
+  private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "id_book", nullable = false)
-    private Book book;
+  @ManyToOne
+  @JoinColumn(name = "id_book", nullable = false)
+  private Book book;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "movement_type", nullable = false)
-    private MovementType movementType;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "movement_type", nullable = false)
+  private MovementType movementType;
 
-    @Column(name = "movement_date", nullable = false)
-    private LocalDateTime movementDate;
+  @Column(name = "movement_date", nullable = false)
+  private LocalDateTime movementDate;
 
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+  @Column(name = "quantity", nullable = false)
+  private Integer quantity;
+
+  @ManyToOne
+  @JoinColumn(name = "sale_id", nullable = true)
+  private Sale sale;
+
+  @Column(name = "reason")
+  private String reason;
 }

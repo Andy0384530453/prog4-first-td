@@ -11,30 +11,32 @@ import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "sale_book")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class SaleBook {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id_sale_book", updatable = false, nullable = false)
-    private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(name = "id_sale_book", updatable = false, nullable = false)
+  private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "id_sale", nullable = false)
-    private Sale sale;
+  @ManyToOne
+  @JoinColumn(name = "id_sale", nullable = false)
+  private Sale sale;
 
-    @ManyToOne
-    @JoinColumn(name = "id_book", nullable = false)
-    private Book book;
+  @ManyToOne
+  @JoinColumn(name = "id_book", nullable = false)
+  private Book book;
 
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+  @Column(name = "quantity", nullable = false)
+  private Integer quantity;
 }
