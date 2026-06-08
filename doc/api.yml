@@ -12,8 +12,6 @@ tags:
     description: Book inventory and analytics
   - name: Sales
     description: Customer purchases and billing
-  - name: Locations
-    description: Book rentals and return tracking
   - name: Customers
     description: Customer profile management
 
@@ -129,7 +127,8 @@ paths:
           required: true
           description: Unique identifier of the sale
           schema:
-            type: integer
+            type: string
+            format: uuid
       responses:
         '200':
           description: Sale details found
@@ -139,51 +138,6 @@ paths:
                 $ref: '#/components/schemas/SaleDetail'
         '404':
           description: Sale not found
-
-  /locations:
-    post:
-      summary: Register a book rental
-      tags:
-        - Locations
-      description: Creates a rental record for associated books and decrements available inventory.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LocationInput'
-      responses:
-        '201':
-          description: Rental registered successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LocationDetail'
-        '400':
-          description: Invalid rental data or insufficient stock
-
-  /locations/{id}/return:
-    put:
-      summary: Process a rental return
-      tags:
-        - Locations
-      description: Updates the actual return timestamp, changes rental status, and replenishes book inventory.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: Unique identifier of the rental
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Return processed successfully and stock updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LocationDetail'
-        '404':
-          description: Rental record not found
 
   /customers:
     get:
@@ -241,7 +195,8 @@ components:
         - first_name
       properties:
         id_author:
-          type: integer
+          type: string
+          format: uuid
         last_name:
           type: string
         first_name:
@@ -254,6 +209,7 @@ components:
         - isbn
         - purchase_price
         - selling_price
+        - category
       properties:
         isbn:
           type: string
@@ -263,6 +219,8 @@ components:
         selling_price:
           type: number
           format: float
+        category:
+          $ref: '#/components/schemas/CategoryDetail'
 
     BookDetail:
       type: object
@@ -273,6 +231,7 @@ components:
         - purchase_price
         - selling_price
         - current_stock
+        - category
       properties:
         isbn:
           type: string
@@ -291,6 +250,8 @@ components:
           format: float
         current_stock:
           type: integer
+        category:
+          $ref: '#/components/schemas/CategoryDetail'
         authors:
           type: array
           items:
@@ -330,7 +291,8 @@ components:
         - last_name
       properties:
         id_customer:
-          type: integer
+          type: string
+          format: uuid
         first_name:
           type: string
         last_name:
@@ -340,6 +302,20 @@ components:
         email:
           type: string
           format: email
+
+
+    CategoryDetail:
+      type: object
+      required:
+        - id_category
+        - category_name
+      properties:
+        id_category:
+          type: string
+          format: uuid
+        category_name:
+          type: string
+          enum: [LARGE, MEDIUM, SMALL]
 
 
     BookQuantityReference:
@@ -361,7 +337,8 @@ components:
         - books
       properties:
         customer_id:
-          type: integer
+          type: string
+          format: uuid
         books:
           type: array
           items:
@@ -376,62 +353,14 @@ components:
         - books
       properties:
         id_sale:
-          type: integer
+          type: string
+          format: uuid
         sale_date:
           type: string
           format: date-time
         payment_status:
           type: string
           enum: [PENDING, PAID, CANCELLED]
-        customer:
-          $ref: '#/components/schemas/CustomerDetail'
-        books:
-          type: array
-          items:
-            $ref: '#/components/schemas/BookQuantityReference'
-
-
-    LocationInput:
-      type: object
-      required:
-        - customer_id
-        - expected_return_date
-        - books
-      properties:
-        customer_id:
-          type: integer
-        expected_return_date:
-          type: string
-          format: date
-        books:
-          type: array
-          items:
-            $ref: '#/components/schemas/BookQuantityReference'
-
-    LocationDetail:
-      type: object
-      required:
-        - id_location
-        - location_date
-        - expected_return_date
-        - status
-        - books
-      properties:
-        id_location:
-          type: integer
-        location_date:
-          type: string
-          format: date
-        expected_return_date:
-          type: string
-          format: date
-        actual_return_date:
-          type: string
-          format: date
-          nullable: true
-        status:
-          type: string
-          enum: [ACTIVE, RETURNED, LATE]
         customer:
           $ref: '#/components/schemas/CustomerDetail'
         books:
@@ -448,9 +377,11 @@ components:
         - movement_type
         - movement_date
         - quantity
+        - reason
       properties:
         id_stock:
-          type: integer
+          type: string
+          format: uuid
         isbn:
           type: string
         movement_type:
@@ -461,3 +392,9 @@ components:
           format: date-time
         quantity:
           type: integer
+        sale_id:
+          type: string
+          format: uuid
+          nullable: true
+        reason:
+          type: string
