@@ -33,8 +33,8 @@ public class StockHistory {
   private UUID id;
 
   @ManyToOne
-  @JoinColumn(name = "id_book", nullable = false)
-  private Book book;
+  @JoinColumn(name = "id_book_copy", nullable = false)
+  private BookCopy bookCopy;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "movement_type", nullable = false)

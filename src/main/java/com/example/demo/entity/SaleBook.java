@@ -34,8 +34,8 @@ public class SaleBook {
   private Sale sale;
 
   @ManyToOne
-  @JoinColumn(name = "id_book", nullable = false)
-  private Book book;
+  @JoinColumn(name = "id_book_copy", nullable = false)
+  private BookCopy bookCopy;
 
   @Column(name = "quantity", nullable = false)
   private Integer quantity;
