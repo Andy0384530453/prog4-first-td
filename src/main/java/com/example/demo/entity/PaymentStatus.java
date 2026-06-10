@@ -1,4 +1,4 @@
-package com.example.demo.endpoint.rest.entity;
+package com.example.demo.entity;
 
 public enum PaymentStatus {
   PENDING,

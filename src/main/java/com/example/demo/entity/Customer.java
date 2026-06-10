@@ -1,9 +1,7 @@
-package com.example.demo.endpoint.rest.entity;
+package com.example.demo.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,20 +14,28 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "category")
+@Table(name = "customer")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Category {
+public class Customer {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
-  @Column(name = "id_category", updatable = false, nullable = false)
+  @Column(name = "id_customer", updatable = false, nullable = false)
   private UUID id;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "category_name", nullable = false, unique = true)
-  private CategoryEnum categoryEnum;
+  @Column(name = "first_name", nullable = false)
+  private String firstName;
+
+  @Column(name = "last_name", nullable = false)
+  private String lastName;
+
+  @Column(name = "phone_number")
+  private String phoneNumber;
+
+  @Column(name = "email")
+  private String email;
 }
