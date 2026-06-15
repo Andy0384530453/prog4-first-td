@@ -1,7 +1,10 @@
 package com.example.demo.entity;
 
 public enum CategoryEnum {
-  LARGE,
-  MEDIUM,
-  SMALL
+  ROMAN,
+  FANTASY,
+  THRILLER,
+  MANGA,
+  BANDE_DESSINEE,
+  CONTE
 }
