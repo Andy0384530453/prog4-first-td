@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.BookCopy;
 import com.example.demo.service.BookCopyService;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class BookCopyController {
 
   private final BookCopyService bookCopyService;
+
+  @GetMapping
+  public ResponseEntity<List<BookCopy>> getAllBookCopies() {
+    return ResponseEntity.ok(bookCopyService.getAllBookCopies());
+  }
 
   @GetMapping("/{id}")
   public ResponseEntity<BookCopy> getBookCopyById(@PathVariable UUID id) {
