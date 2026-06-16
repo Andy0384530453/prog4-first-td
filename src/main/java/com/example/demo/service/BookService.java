@@ -1,0 +1,37 @@
+package com.example.demo.service;
+
+import com.example.demo.entity.Book;
+import com.example.demo.entity.BookCopy;
+import com.example.demo.entity.SaleBook;
+import com.example.demo.repository.BookRepository;
+import com.example.demo.repository.SaleRepository;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class BookService {
+
+  private final BookRepository bookRepository;
+  private final SaleRepository saleRepository;
+
+  @Transactional(readOnly = true)
+  public List<Book> getBooksSoldToday() {
+    LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+    LocalDateTime endOfDay = LocalDate.now().plusDays(1).atStartOfDay();
+
+    return new ArrayList<>(
+        saleRepository.findBySaleDateBetween(startOfDay, endOfDay).stream()
+            .flatMap(sale -> sale.getBooks().stream())
+            .map(SaleBook::getBookCopy)
+            .map(BookCopy::getBook)
+            .collect(Collectors.toMap(Book::getId, b -> b, (a, b) -> a))
+            .values());
+  }
+}
