@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,5 +34,11 @@ public class BookService {
             .map(BookCopy::getBook)
             .collect(Collectors.toMap(Book::getId, b -> b, (a, b) -> a))
             .values());
+  }
+
+
+  public Book getBookById(UUID id){
+  return bookRepository.findBooksById(id);
+
   }
 }
