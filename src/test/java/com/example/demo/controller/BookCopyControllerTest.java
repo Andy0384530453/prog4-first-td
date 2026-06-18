@@ -4,20 +4,22 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.example.demo.entity.Book;
-import com.example.demo.entity.BookCopy;
+import com.example.demo.dto.BookCopyResponseDto;
 import com.example.demo.entity.FormatType;
+import com.example.demo.exception.GlobalExceptionHandler;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.service.BookCopyService;
 import java.math.BigDecimal;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(BookCopyController.class)
+@Import(GlobalExceptionHandler.class)
 class BookCopyControllerTest {
 
   @Autowired private MockMvc mockMvc;
@@ -28,18 +30,18 @@ class BookCopyControllerTest {
   void getBookCopyById_shouldReturn200_whenExists() throws Exception {
     UUID id = UUID.randomUUID();
 
-    BookCopy bookCopy =
-        BookCopy.builder()
-            .id(id)
-            .isbn("978-3-16-148410-0")
-            .purchasePrice(new BigDecimal("10.00"))
-            .sellingPrice(new BigDecimal("15.00"))
-            .currentStock(5)
-            .formatType(FormatType.POCHE)
-            .book(new Book())
-            .build();
+    BookCopyResponseDto dto =
+        new BookCopyResponseDto(
+            id,
+            "978-3-16-148410-0",
+            new BigDecimal("10.00"),
+            new BigDecimal("15.00"),
+            5,
+            FormatType.POCHE,
+            UUID.randomUUID(),
+            "Test Book");
 
-    when(bookCopyService.findById(id)).thenReturn(Optional.of(bookCopy));
+    when(bookCopyService.getBookCopyById(id)).thenReturn(dto);
 
     mockMvc
         .perform(get("/book-copies/" + id))
@@ -52,8 +54,14 @@ class BookCopyControllerTest {
   void getBookCopyById_shouldReturn404_whenNotExists() throws Exception {
     UUID id = UUID.randomUUID();
 
-    when(bookCopyService.findById(id)).thenReturn(Optional.empty());
+    when(bookCopyService.getBookCopyById(id))
+        .thenThrow(new ResourceNotFoundException("BookCopy", id));
 
     mockMvc.perform(get("/book-copies/" + id)).andExpect(status().isNotFound());
+  }
+
+  @Test
+  void getBookCopyById_shouldReturn400_whenInvalidUuid() throws Exception {
+    mockMvc.perform(get("/book-copies/invalid-uuid")).andExpect(status().isBadRequest());
   }
 }

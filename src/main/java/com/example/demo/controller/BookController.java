@@ -1,9 +1,10 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.Book;
+import com.example.demo.dto.BookResponseDto;
 import com.example.demo.service.BookService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +17,18 @@ public class BookController {
 
   private final BookService bookService;
 
+  @GetMapping
+  public ResponseEntity<?> getAllBooks() {
+    try {
+      List<BookResponseDto> books = bookService.getAllBooks();
+      return ResponseEntity.ok(books);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("server error");
+    }
+  }
+
   @GetMapping("/sold-today")
-  public ResponseEntity<List<Book>> getBooksSoldToday() {
+  public ResponseEntity<List<BookResponseDto>> getBooksSoldToday() {
     return ResponseEntity.ok(bookService.getBooksSoldToday());
   }
 }
