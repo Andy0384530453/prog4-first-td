@@ -23,6 +23,11 @@ public class BookService {
   private final SaleRepository saleRepository;
 
   @Transactional(readOnly = true)
+  public List<BookResponseDto> getAllBooks() {
+    return bookRepository.findAll().stream().map(this::toDto).toList();
+  }
+
+  @Transactional(readOnly = true)
   public List<BookResponseDto> getBooksSoldToday() {
     LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
     LocalDateTime endOfDay = LocalDate.now().plusDays(1).atStartOfDay();
