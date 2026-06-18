@@ -43,5 +43,6 @@ public class Book {
       inverseJoinColumns = @JoinColumn(name = "id_author"))
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
+  @com.fasterxml.jackson.annotation.JsonIgnoreProperties("books")
   private List<Author> authors;
 }

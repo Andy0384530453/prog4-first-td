@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.Book;
+import com.example.demo.dto.BookResponseDto;
 import com.example.demo.service.BookService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class BookController {
   private final BookService bookService;
 
   @GetMapping("/sold-today")
-  public ResponseEntity<List<Book>> getBooksSoldToday() {
+  public ResponseEntity<List<BookResponseDto>> getBooksSoldToday() {
     return ResponseEntity.ok(bookService.getBooksSoldToday());
   }
 }

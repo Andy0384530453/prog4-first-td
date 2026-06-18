@@ -40,5 +40,6 @@ public class Author {
   @ManyToMany(mappedBy = "authors")
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
+  @com.fasterxml.jackson.annotation.JsonIgnoreProperties("authors")
   private List<Book> books;
 }

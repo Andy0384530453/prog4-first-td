@@ -1,10 +1,12 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.BookCopy;
+import com.example.demo.dto.BookCopyResponseDto;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.service.BookCopyService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,15 +21,25 @@ public class BookCopyController {
   private final BookCopyService bookCopyService;
 
   @GetMapping
-  public ResponseEntity<List<BookCopy>> getAllBookCopies() {
+  public ResponseEntity<List<BookCopyResponseDto>> getAllBookCopies() {
     return ResponseEntity.ok(bookCopyService.getAllBookCopies());
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<BookCopy> getBookCopyById(@PathVariable UUID id) {
-    return bookCopyService
-        .findById(id)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+  public ResponseEntity<?> getBookCopyById(@PathVariable String id) {
+    try {
+      UUID uuid = UUID.fromString(id);
+
+      BookCopyResponseDto response = bookCopyService.getBookCopyById(uuid);
+      return ResponseEntity.ok(response);
+
+    } catch (IllegalArgumentException e) {
+
+      return ResponseEntity.badRequest().body("the provided identifier is not a valid UUID");
+
+    } catch (ResourceNotFoundException e) {
+
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erreur 404 : " + e.getMessage());
+    }
   }
 }

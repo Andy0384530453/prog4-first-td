@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.BookResponseDto;
 import com.example.demo.entity.Book;
 import com.example.demo.entity.BookCopy;
 import com.example.demo.entity.SaleBook;
@@ -22,16 +23,28 @@ public class BookService {
   private final SaleRepository saleRepository;
 
   @Transactional(readOnly = true)
-  public List<Book> getBooksSoldToday() {
+  public List<BookResponseDto> getBooksSoldToday() {
     LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
     LocalDateTime endOfDay = LocalDate.now().plusDays(1).atStartOfDay();
 
     return new ArrayList<>(
-        saleRepository.findBySaleDateBetween(startOfDay, endOfDay).stream()
-            .flatMap(sale -> sale.getBooks().stream())
-            .map(SaleBook::getBookCopy)
-            .map(BookCopy::getBook)
-            .collect(Collectors.toMap(Book::getId, b -> b, (a, b) -> a))
-            .values());
+            saleRepository.findBySaleDateBetween(startOfDay, endOfDay).stream()
+                .flatMap(sale -> sale.getBooks().stream())
+                .map(SaleBook::getBookCopy)
+                .map(BookCopy::getBook)
+                .collect(Collectors.toMap(Book::getId, b -> b, (a, b) -> a))
+                .values())
+        .stream().map(this::toDto).toList();
+  }
+
+  private BookResponseDto toDto(Book book) {
+    return new BookResponseDto(
+        book.getId(),
+        book.getTitle(),
+        book.getPublicationDate(),
+        book.getCategory() != null ? book.getCategory().getCategoryEnum().name() : null,
+        book.getAuthors() != null
+            ? book.getAuthors().stream().map(a -> a.getFirstName() + " " + a.getLastName()).toList()
+            : List.of());
   }
 }
