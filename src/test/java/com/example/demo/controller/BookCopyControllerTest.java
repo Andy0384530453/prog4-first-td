@@ -10,6 +10,7 @@ import com.example.demo.exception.GlobalExceptionHandler;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.service.BookCopyService;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,4 +65,36 @@ class BookCopyControllerTest {
   void getBookCopyById_shouldReturn400_whenInvalidUuid() throws Exception {
     mockMvc.perform(get("/book-copies/invalid-uuid")).andExpect(status().isBadRequest());
   }
+
+  @Test
+  void getAllBookCopies_shouldReturn200_withList() throws Exception {
+    BookCopyResponseDto dto =
+            new BookCopyResponseDto(
+                    UUID.randomUUID(),
+                    "978-3-16-148410-0",
+                    new BigDecimal("10.00"),
+                    new BigDecimal("15.00"),
+                    5,
+                    FormatType.POCHE,
+                    UUID.randomUUID(),
+                    "Test Book");
+
+    when(bookCopyService.getAllBookCopies()).thenReturn(List.of(dto));
+
+    mockMvc
+            .perform(get("/book-copies"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].isbn").value("978-3-16-148410-0"));
+  }
+
+  @Test
+  void getAllBookCopies_shouldReturn200_whenEmpty() throws Exception {
+    when(bookCopyService.getAllBookCopies()).thenReturn(List.of());
+
+    mockMvc
+            .perform(get("/book-copies"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isEmpty());
+  }
+
 }
