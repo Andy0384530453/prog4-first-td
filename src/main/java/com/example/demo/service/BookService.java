@@ -4,12 +4,14 @@ import com.example.demo.dto.BookResponseDto;
 import com.example.demo.entity.Book;
 import com.example.demo.entity.BookCopy;
 import com.example.demo.entity.SaleBook;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.BookRepository;
 import com.example.demo.repository.SaleRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,13 @@ public class BookService {
   @Transactional(readOnly = true)
   public List<BookResponseDto> getAllBooks() {
     return bookRepository.findAll().stream().map(this::toDto).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public BookResponseDto getBookById(UUID id) {
+    Book book =
+        bookRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book", id));
+    return toDto(book);
   }
 
   @Transactional(readOnly = true)
