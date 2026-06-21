@@ -30,6 +30,17 @@ public class GlobalExceptionHandler {
                 "timestamp", Instant.now().toString()));
   }
 
+  @ExceptionHandler(InsufficientStockException.class)
+  public ResponseEntity<Map<String, Object>> handleInsufficientStock(
+      InsufficientStockException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT)
+        .body(
+            Map.of(
+                "error", "Conflict",
+                "message", ex.getMessage(),
+                "timestamp", Instant.now().toString()));
+  }
+
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)

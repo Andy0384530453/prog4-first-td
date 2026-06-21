@@ -10,6 +10,8 @@ servers:
 tags:
   - name: Books
     description: Book inventory and analytics
+  - name: BookCopies
+    description: Stock management per copy and format
   - name: Sales
     description: Customer purchases and billing
   - name: Customers
@@ -92,6 +94,147 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BookDetail'
+
+  /books/{bookId}/copies/stock:
+    get:
+      summary: Get book stock by format or grouped
+      tags:
+        - BookCopies
+      description: |
+        Returns the available stock for a book.
+        If the `format` query parameter is provided, returns the total stock for that specific format.
+        Otherwise, returns the stock grouped by all available formats.
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          description: UUID of the book
+          schema:
+            type: string
+            format: uuid
+        - name: format
+          in: query
+          required: false
+          description: Filter by format type (POCHE, BROCHE, RELIE, CARTONNE)
+          schema:
+            $ref: '#/components/schemas/FormatType'
+      responses:
+        '200':
+          description: Stock information
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/StockResponse'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/StockByFormatEntry'
+        '400':
+          description: Invalid UUID or format value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /books/{bookId}/copies/{copyId}/decrement:
+    post:
+      summary: Decrement stock for a specific copy
+      tags:
+        - BookCopies
+      description: Decreases the stock of a BookCopy when a sale occurs. Checks that the remaining stock does not become negative.
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          description: UUID of the book
+          schema:
+            type: string
+            format: uuid
+        - name: copyId
+          in: path
+          required: true
+          description: UUID of the BookCopy
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockRequest'
+      responses:
+        '200':
+          description: Stock decremented successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockUpdateResponse'
+        '400':
+          description: Invalid UUID or non-positive quantity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: BookCopy not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Insufficient stock
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /books/{bookId}/copies/{copyId}/increment:
+    post:
+      summary: Increment stock for a specific copy
+      tags:
+        - BookCopies
+      description: Increases the stock of a BookCopy during restocking.
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          description: UUID of the book
+          schema:
+            type: string
+            format: uuid
+        - name: copyId
+          in: path
+          required: true
+          description: UUID of the BookCopy
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockRequest'
+      responses:
+        '200':
+          description: Stock incremented successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockUpdateResponse'
+        '400':
+          description: Invalid UUID or non-positive quantity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: BookCopy not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /sales:
     post:
@@ -398,3 +541,66 @@ components:
           nullable: true
         reason:
           type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error category
+        message:
+          type: string
+          description: Human-readable error description
+        timestamp:
+          type: string
+          format: date-time
+          description: When the error occurred
+
+    FormatType:
+      type: string
+      enum: [POCHE, BROCHE, RELIE, CARTONNE]
+
+    StockResponse:
+      type: object
+      required:
+        - currentStock
+      properties:
+        currentStock:
+          type: integer
+          description: Total available stock for the given book and format
+
+    StockByFormatEntry:
+      type: object
+      required:
+        - format
+        - stock
+      properties:
+        format:
+          $ref: '#/components/schemas/FormatType'
+        stock:
+          type: integer
+          description: Total stock for this format
+
+    StockRequest:
+      type: object
+      required:
+        - quantity
+      properties:
+        quantity:
+          type: integer
+          minimum: 1
+          description: Number of copies to add or remove
+
+    StockUpdateResponse:
+      type: object
+      required:
+        - bookCopyId
+        - newStock
+      properties:
+        bookCopyId:
+          type: string
+          format: uuid
+          description: Identifier of the updated BookCopy
+        newStock:
+          type: integer
+          description: New stock level after the operation
